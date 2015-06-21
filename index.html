@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>fSelector</title>
+	<link type="text/css" rel="stylesheet" href="./other/bootstrap.css">
+	<link type="text/css" rel="stylesheet" href="./css/fSelect.css">
+</head>
+<body>
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-md-3 col-md-offset-1">
+				<select name="project" multiple>
+					<option>Please Choose</option>
+					<option value="1">Team A</option>
+					<option value="2">Team B</option>
+					<option value="3">Team C</option>
+					<option value="4">Team D</option>
+					<option value="5">Team E</option>
+					<option value="6">Team F</option>
+					<option value="7">Team G</option>
+					<option value="8">Team H</option>
+					<option value="9">Team I</option>
+					<option value="10" data-parent='1'>Project 1</option>
+					<option value="11" data-parent='1'>Project 2</option>
+					<option value="12" data-parent='1'>Project 3</option>
+					<option value="13" data-parent='2'>Project 1</option>
+					<option value="14" data-parent='2'>Project 2</option>
+					<option value="15" data-parent='3'>Project 1</option>
+					<option value="16" data-parent='3'>Project 2</option>
+					<option value="17" data-parent='4'>Project X</option>
+					<option value="18" data-parent='17'>Project Y</option>
+					<option value="19" data-parent='17'>Project Z</option>
+				</select>
+			</div>
+			<div class="col-md-4 open">
+				<span class="log"></span>
+			</div>
+		</div>
+	</div>
+</body>
+<script type="text/javascript" src="./other/jquery_bootstrap.js"></script>
+<script type="text/javascript" src="./js/fSelect.jquery.js"></script>
+<script>
+	$('select').first().fSelect({
+		showLog:true
+		});
+$('select').first().on('fs.valueUpdate', function(){
+	var value = $('select').first().val();
+	var newLog = $('<div>').html('The new value becomes "' + value + '"');
+	$('.log').append(newLog);
+});
+</script>
+</html>

@@ -1,0 +1,64 @@
+.f-select-container{
+  min-height: 200px;
+  max-height: 400px;
+  .btn.btn-action{
+    width: 20px;
+    height: 20px;
+    padding: 0 0 0 0;
+    margin-top: 3px;
+  }
+  .fSelect-result, ul{
+    width: 95%;
+    max-width: 400px;
+    margin-left: 2%;
+    margin-right: 2%;
+  }
+  ul{
+    top: 0px;
+    overflow: scroll;
+    position: relative;
+    max-height: 400px;
+    height: 100%;
+  }
+  .fSelect-result{
+    margin-bottom: 2px;
+    margin-top: 3px;
+    margin-left: 5px;
+    padding: 5px;
+    padding-left: 18px;
+  }
+  li a span.jump-area{
+    display: inline-block;
+    width: 90%;
+    overflow: hidden;
+    position: relative;
+    top: 4px;
+  }
+  li{
+    cursor: pointer;
+    .btn-check{
+      display: block;
+    }
+    .btn-cancel{
+      display: none;
+    }
+    &.active a{
+      background-color: #c0c0c0;
+      color: #262626;
+      &:hover{
+        background-color: #c0c0c0;
+        color: #262626;
+      }
+      .btn-check{
+        display: none;
+      }
+      .btn-cancel{
+        display: block;
+      }
+    }
+  }
+  button.close{
+    padding-right: 18px;
+    margin-top: -2px;
+  }
+}

@@ -1,0 +1,65 @@
+.f-select-container {
+  min-height: 200px;
+  max-height: 400px;
+}
+.f-select-container .btn.btn-action {
+  width: 20px;
+  height: 20px;
+  padding: 0 0 0 0;
+  margin-top: 3px;
+}
+.f-select-container .fSelect-result,
+.f-select-container ul {
+  width: 95%;
+  max-width: 400px;
+  margin-left: 2%;
+  margin-right: 2%;
+}
+.f-select-container ul {
+  top: 0px;
+  overflow: scroll;
+  position: relative;
+  max-height: 400px;
+  height: 100%;
+}
+.f-select-container .fSelect-result {
+  margin-bottom: 2px;
+  margin-top: 3px;
+  margin-left: 5px;
+  padding: 5px;
+  padding-left: 18px;
+}
+.f-select-container li a span.jump-area {
+  display: inline-block;
+  width: 90%;
+  overflow: hidden;
+  position: relative;
+  top: 4px;
+}
+.f-select-container li {
+  cursor: pointer;
+}
+.f-select-container li .btn-check {
+  display: block;
+}
+.f-select-container li .btn-cancel {
+  display: none;
+}
+.f-select-container li.active a {
+  background-color: #c0c0c0;
+  color: #262626;
+}
+.f-select-container li.active a:hover {
+  background-color: #c0c0c0;
+  color: #262626;
+}
+.f-select-container li.active a .btn-check {
+  display: none;
+}
+.f-select-container li.active a .btn-cancel {
+  display: block;
+}
+.f-select-container button.close {
+  padding-right: 18px;
+  margin-top: -2px;
+}

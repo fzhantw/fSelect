@@ -8,6 +8,26 @@
 'use Strict';
 (function($){
 
+	function _findChildOptions($thisOption){
+		var $container = $thisOption.parents('.f-select-container');
+		var $select = $container.prev();
+		var _value = $thisOption.find('.jump-area').data('value');
+
+		var $childs = $select.find('[value='+ _value +']');
+		var childStack = [_value];
+
+		while(childStack.length !== 0){
+			_value = childStack.pop();
+			var $_childs = $select.find('[data-parent='+ _value +']');
+			$_childs.each(function(index, item){
+				$this = $(item);
+				childStack.push($this.attr('value'));
+			});
+			$.merge($childs, $_childs);
+		}
+		return $childs;
+	}
+
 	function _removeResult(){
 		$this = $(this);
 
@@ -18,11 +38,19 @@
 
 		var origValue = $select.val();
 		var isMultiple = $container.data('fSelect.isMultiple');
+		var inheritChild = $container.data('fSelect.inheritChild');
 
 		if(isMultiple){
-			var oldValueIndex = origValue.indexOf('' + _value);
-			origValue.splice(oldValueIndex, 1);
-			$select.val(origValue);
+			if(inheritChild){
+				var allChilds = _findChildOptions($thisOption);
+				allChilds.removeAttr('selected');
+				_refresh_checks($select);
+			}
+			else{
+				var oldValueIndex = origValue.indexOf('' + _value);
+				origValue.splice(oldValueIndex, 1);
+				$select.val(origValue);
+			}
 		}
 		else{
 			$select.val('');
@@ -33,13 +61,19 @@
 		$select.trigger('fs.valueUpdate');
 	}
 
-	function _showTheContainer(parentValue, item){
+	function _showTheContainerByParentValue(parentValue, item){
 		$container = $(item).parents('.f-select-container');
 		optionMapping = $container.data('fSelect.optionMapping');
 
 		var parentsCollectionValue = optionMapping.indexOf( '' + parentValue);
+		_showTheContainer(parentsCollectionValue, item);
+	}
 
-		$targetContainer = $container.find('.f-dropdown-container.f-parent-' + parentsCollectionValue);
+	function _showTheContainer(parentId, item){
+		$container = $(item).parents('.f-select-container');
+		optionMapping = $container.data('fSelect.optionMapping');
+
+		$targetContainer = $container.find('.f-dropdown-container.f-parent-' + parentId);
 
 		if($targetContainer.length !== 0){
 			$container.find('.f-dropdown-container').removeClass('open');
@@ -65,7 +99,7 @@
 		stack.push($currentUlContainer.data('parentValue'));
 		$container.data('fSelect.stack', stack);
 
-		_showTheContainer(value, $this);
+		_showTheContainerByParentValue(value, $this);
 
 		$select.trigger('fs.afterSelect');
 	}
@@ -73,9 +107,9 @@
 	function _onBackOptionClick(){
 		var stack = $container.data('fSelect.stack');
 		var parentValue = stack.pop();
-		var $select = $container.prev();
 		$container.data('fSelect.stack', stack);
 
+		var $select = $container.prev();
 		$select.trigger('fs.backToParent');
 
 		_showTheContainer(parentValue, this);
@@ -94,6 +128,7 @@
 		var $select = $container.prev();
 
 		var isMultiple = $container.data('fSelect.isMultiple'); 
+		var inheritChild = $container.data('fSelect.inheritChild'); 
 
 		var isDuplicate = false;
 		$container.find('.fSelect-result').each(function(index, item){
@@ -123,14 +158,19 @@
 			$select.val(_value);
 		}
 		else{
-			var origValue = $select.val();
-
-			if( origValue === null ){
-				origValue = [];
+			if(inheritChild){
+				var allChilds = _findChildOptions($thisOption);
+				allChilds.attr('selected', 'selected');
+				_refresh_checks($select);
 			}
-
-			origValue.push(_value);
-			$select.val(origValue);
+			else{
+				var origValue = $select.val();
+				if( origValue === null ){
+					origValue = [];
+				}
+				origValue.push(_value);
+				$select.val(origValue);
+			}
 		}
 
 		$select.trigger('fs.valueUpdate');
@@ -143,6 +183,7 @@
 
 		var _options = {
 			isMultiple: false,
+			inheritChild: false,
 			logArea: '',
 			logMethod: function(datas){
 				var result = '';
@@ -174,18 +215,17 @@
 			var datas = [];
 			$container.find('.active').each(function(index, item){
 				$item = $(item);
-				console.log($item);
 				datas.push({
 					value: $item.find('.jump-area').data('value'),
 					name: $item.find('.jump-area').data('name')
 				});
 			});
-			console.log(_options);
 			var result = _options.logMethod(datas);
 			$logArea.html(result);
 		});
 
 		$container.data('fSelect.isMultiple', _options.isMultiple);
+		$container.data('fSelect.inheritChild', _options.inheritChild);
 
 		/*
 		 * optionMapping: [optionCollectionIndex: parentId]
@@ -210,12 +250,21 @@
 
 			optionCollection[optionCollectionIndex].push(item);
 		});
+		var ulHeight = 0;
+		$tempContainer = $container;
+		while(ulHeight == 0){
+			ulHeight = $tempContainer.height();
+			$tempContainer = $tempContainer.parent();
+		}
 
 		optionMapping.forEach(function(index, optionCollectionIndex){
 			var collection = optionCollection[optionCollectionIndex];
 			var $ulContainer = $('<div>')
 				.addClass('f-dropdown-container f-parent-' + optionCollectionIndex)
 				.data('parentValue', optionCollectionIndex)
+				.css({
+					height: ulHeight * 0.95
+				})
 				.appendTo($container)
 				;
 			var $menuContainer = $('<ul>')
@@ -228,7 +277,7 @@
 				childCount = '';
 				if(childCollectionIndex != -1){
 					var childCollection = optionCollection[childCollectionIndex];
-					childCount = "(" + childCollection.length + ")" + '&nbsp;&nbsp;<i class="fa fa-long-arrow-right"></i>';
+					childCount = "(" + childCollection.length + ")" + '&nbsp;&nbsp;';
 				}
 
 				$liOption = $('<li>')
@@ -239,23 +288,29 @@
 					.html('&#x02715;')
 					.addClass('btn btn-danger btn-sm btn-action btn-cancel pull-right')
 					.click(_removeResult)
+					.attr({
+						type: 'button'
+					})
 					.appendTo($buttons)
 					;
 				$chooseButton = $('<button>')
 					.html('&#x02713;')
 					.addClass('btn btn-success btn-sm btn-action btn-check pull-right')
 					.click(_chooseTheItem)
+					.attr({
+						type: 'button'
+					})
 					.appendTo($buttons)
 					;
 
-				var trimmed_name = _option.name.substr(0, 19);
-				if( _option.name.length >= 19 ){
+				var trimmed_name = _option.name.substr(0, 50);
+				if( _option.name.length >= 50 ){
 					trimmed_name += '...';
 				}
 				$aJumpArea = $('<span>')
 					.addClass('jump-area')
 					.click(_onOptionClick)
-					.html(trimmed_name + '&nbsp;' + childCount)
+					.html( (childCount !== '' ?'<i class="fa fa-long-arrow-right"></i>&nbsp;':'')  + trimmed_name + '&nbsp;' + childCount)
 					.data({
 						value: _option.value,
 						name: _option.name,
@@ -268,13 +323,15 @@
 					;
 			});
 			if( optionCollectionIndex !== 0 ){
-				$backLi = $('<li>');
+				$backLi = $('<li>') ;
+				var parent_name = $select.find('option[value='+ index +']').html();
 				$backOption = $('<a>')
-					.html('<i class="fa fa-long-arrow-left"></i>')
+					.html('<i class="fa fa-long-arrow-left"></i>&nbsp;' + parent_name)
 					.click(_onBackOptionClick)
 					.appendTo($backLi)
 				;
 				$menuContainer.prepend($backLi);
+				$backLi.after('<li role="separator" class="divider"></li>') ;
 			}
 		});
 
@@ -283,12 +340,76 @@
 		$container.find('.f-parent-0').addClass('open');
 
 		$container.data('fSelect.stack',[]);
+		_refresh_checks($select);
 	};
+
+	function _refresh_checks(_this){
+		$select = $(_this);
+		$container = $select.next();
+
+		$select = $(_this);
+		var origValue = $select.val();
+
+		if( !$container.hasClass('fSelect-container') ){
+			return;
+		}
+
+		$container.find('.dropdown-menu li').each(function(index, item){
+			$this = $(item);
+			if( $this.find('.jump-area').length === 0 ){
+				return;
+			}
+			var thisValue = $this.find('.jump-area').data('value');
+
+			if(Array.isArray(origValue)){
+				if(origValue.indexOf(thisValue) !== -1 ){
+					$this.addClass('active');
+				}
+				else{
+					$this.removeClass('active');
+				}
+			}
+			else{
+				if(origValue == thisValue ){
+					$this.addClass('active');
+				}
+				else{
+					$this.removeClass('active');
+				}
+			}
+			
+		});
+	}
+
+
 	$.fn.fSelect = function(option){
 		return this.each(function(index, item){
 			if(item.tagName !== 'SELECT') return item;
 
 			$this = $(item);
+
+			if($this.next().hasClass('fSelect-container')){
+				$container = $this.next();
+				switch(option){
+					case 'hide':
+						$container.hide();
+						return $this;
+					break;
+					case 'show':
+						$container.show();
+						return $this;
+					break;
+					case 'refresh':
+						_refresh_checks($this);
+						return $this;
+					break;
+				}
+			}
+
+
+			if($this.next().hasClass('fSelect-container')){
+				return $this;
+			}
 
 			$container = $('<div class="fSelect-container">');
 			$this.after($container);

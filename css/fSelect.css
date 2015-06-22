@@ -8,8 +8,12 @@
   padding: 0 0 0 0;
   margin-top: 3px;
 }
+.f-select-container .f-dropdown-container {
+  position: absolute;
+}
 .f-select-container .fSelect-result,
-.f-select-container ul {
+.f-select-container ul,
+.f-select-container .f-dropdown-container {
   width: 95%;
   max-width: 400px;
   margin-left: 2%;
@@ -62,4 +66,8 @@
 .f-select-container button.close {
   padding-right: 18px;
   margin-top: -2px;
+}
+.f-select-container .dropdown-menu {
+  -webkit-box-shadow: none;
+  box-shadow: none;
 }

@@ -29,7 +29,7 @@
 	}
 
 	function _removeResult(){
-		$this = $(this);
+		var $this = $(this);
 
 		var $thisOption = $this.parents('li').first(); 
 		var $container = $this.parents('.f-select-container');
@@ -70,10 +70,10 @@
 	}
 
 	function _showTheContainer(parentId, item){
-		$container = $(item).parents('.f-select-container');
-		optionMapping = $container.data('fSelect.optionMapping');
+		var $container = $(item).parents('.f-select-container');
+		var optionMapping = $container.data('fSelect.optionMapping');
 
-		$targetContainer = $container.find('.f-dropdown-container.f-parent-' + parentId);
+		var $targetContainer = $container.find('.f-dropdown-container.f-parent-' + parentId);
 
 		if($targetContainer.length !== 0){
 			$container.find('.f-dropdown-container').removeClass('open');
@@ -286,7 +286,7 @@
 				$buttons = $('<span>');
 				$removeButton = $('<button>')
 					.html('&#x02715;')
-					.addClass('btn btn-danger btn-sm btn-action btn-cancel pull-right')
+					.addClass('btn btn-success btn-sm btn-action btn-cancel pull-right')
 					.click(_removeResult)
 					.attr({
 						type: 'button'
@@ -294,8 +294,8 @@
 					.appendTo($buttons)
 					;
 				$chooseButton = $('<button>')
-					.html('&#x02713;')
-					.addClass('btn btn-success btn-sm btn-action btn-check pull-right')
+					.html(' ')
+					.addClass('btn btn-default btn-sm btn-action btn-check pull-right')
 					.click(_chooseTheItem)
 					.attr({
 						type: 'button'

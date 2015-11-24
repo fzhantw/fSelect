@@ -185,6 +185,7 @@
 			isMultiple: false,
 			inheritChild: false,
 			logArea: '',
+			default_parent: '0',
 			logMethod: function(datas){
 				var result = '';
 				datas.forEach(function(data,index){
@@ -337,7 +338,7 @@
 
 		$container.data('fSelect.optionMapping', optionMapping);
 
-		$container.find('.f-parent-0').addClass('open');
+		$container.find('.f-parent-' + _options.default_parent).addClass('open');
 
 		$container.data('fSelect.stack',[]);
 		_refresh_checks($select);
